@@ -8,32 +8,18 @@ const {
   assert
 } = require('chai');
 
-const iosApp = require('ios-app-bootstrap');
-const androidApp = require('android-app-bootstrap');
+const app = path.join(__dirname, '../fixtures/v1/android_app_bootstrap-debug.apk');
 
-console.log(`iOS App :${iosApp.appPath}`);
-console.log(`Android App :${androidApp.appPath}`);
+console.log(`Android App :${app}`);
 
 const {
   opn
 } = _;
 
-var platform = process.env.platform || 'iOS';
+var platform = process.env.platform || 'Android';
 platform = platform.toLowerCase();
 
 const pkg = require('../package');
-
-// see: https://macacajs.github.io/desired-caps
-
-var iOSOpts = {
-  deviceName: 'iPhone 6s',
-  platformName: 'iOS',
-  //autoAcceptAlerts: true,
-  //reuse: 3,
-  //udid: '',
-  //bundleId: 'xudafeng.ios-app-bootstrap',
-  app: iosApp.appPath
-};
 
 var androidOpts = {
   platformName: 'Android',
@@ -43,17 +29,16 @@ var androidOpts = {
   //udid: '',
   //package: 'com.github.android_app_bootstrap',
   //activity: 'com.github.android_app_bootstrap.activity.WelcomeActivity',
-  app: androidApp.appPath
+  app,
 };
 
-const isIOS = platform === 'ios';
-const infoBoardXPath = isIOS ? '//*[@name="info"]' : '//*[@resource-id="com.github.android_app_bootstrap:id/info"]';
-const webviewButtonXPath = isIOS ? '//*[@name="Webview"]' : '//*[@resource-id="android:id/tabs"]/android.widget.LinearLayout[2]';
+const infoBoardXPath = '//*[@resource-id="com.github.android_app_bootstrap:id/info"]';
+const webviewButtonXPath = '//*[@resource-id="android:id/tabs"]/android.widget.LinearLayout[2]';
 
 const wd = require('macaca-wd');
 
 // override custom wd
-require('./wd-extend')(wd, isIOS);
+require('./wd-extend')(wd, false);
 
 describe('macaca-test/mobile-app-sample.test.js', function() {
   this.timeout(10 * 60 * 1000);
@@ -69,7 +54,7 @@ describe('macaca-test/mobile-app-sample.test.js', function() {
 
   before(function() {
     return driver
-      .init(isIOS ? iOSOpts : androidOpts)
+      .init(androidOpts)
       .sleep(10 * 1000);
   });
 
@@ -88,7 +73,7 @@ describe('macaca-test/mobile-app-sample.test.js', function() {
       /*
         .title()
         .then(data => {
-          console.log(`current focus ${isIOS ? 'viewController' : 'activity'}: ${data}`);
+          console.log(`current focus ${'activity'}: ${data}`);
         })
         */
       .getWindowSize()
@@ -163,8 +148,6 @@ describe('macaca-test/mobile-app-sample.test.js', function() {
           return driver
             .waitForElementByXPath(infoBoardXPath)
             .touch('pinch', {
-              scale: 2,      // only for iOS
-              velocity: 1,   // only for iOS
               direction: 'in',// only for Android
               percent: 0.2,  // only for Android
               steps: 200     // only for Android

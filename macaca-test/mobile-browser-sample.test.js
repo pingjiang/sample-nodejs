@@ -7,16 +7,10 @@ const {
   opn
 } = _;
 
-var browserName = process.env.browser || 'safari';
+var browserName = process.env.browser || 'Chrome';
 browserName = browserName.toLowerCase();
 
 const pkg = require('../package');
-
-const iOSSafariOpts = {
-  deviceName: 'iPhone 6',
-  platformName: 'iOS',
-  browserName: 'Safari'
-};
 
 const AndroidChromeOpts = {
   platformName: 'Android',
@@ -61,7 +55,7 @@ describe('macaca-test/mobile-browser-sample.test.js', function() {
 
     before(function() {
       return driver
-        .init(browserName === 'safari' ? iOSSafariOpts : AndroidChromeOpts)
+        .init(AndroidChromeOpts)
         .sleep(10 * 1000);
     });
 
